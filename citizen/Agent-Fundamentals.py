@@ -142,6 +142,17 @@ for event in stream:
         response_id = event.response.id
 
 
+Checking the workflow stream
+for event in stream:
+    if event.type == "response.completed":
+        print("Workflow completed:")
+        for message in event.response.output:
+            if message.content:
+                for content_item in message.content:
+                    if content_item.type == 'output_text':
+                        print(content_item.text)
+    if (event.type == "response.output_item.done") and event.item.type == ItemType.WORKFLOW_ACTION:
+        print(f"Action '{event.item.action_id}' completed with status: {event.item.status}")
 
 # SLIDE 18
 # ============================================================
