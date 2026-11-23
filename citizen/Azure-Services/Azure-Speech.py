@@ -28,6 +28,12 @@ translation_cfg = speech_sdk.translation.SpeechTranslationConfig(
 
 from pathlib import Path
 
+client = AzureOpenAI(
+    azure_endpoint=YOUR_FOUNDRY_ENDPOINT,
+    api_key=YOUR_FOUNDRY_KEY,
+    api_version="2025-03-01-preview"
+)
+
 # Get the audio file
 file_path = Path("speech.mp3")
 audio_file = open(file_path, "rb")
@@ -53,9 +59,16 @@ speech_recognizer = speech_sdk.SpeechRecognizer(
 # Transcribe the audio
 result = speech_recognizer.recognize_once_async().get()
 
-# Display the recognized text
-print(result.text)
-
+# Did it succeed
+if result.reason == speech_sdk.ResultReason.RecognizedSpeech:
+    # Yes!
+    print(f"Transcription:\n{result.text}")
+ifelse result.reason == speech_sdk.ResultReason.CancellationReason:
+    # No. Try to determine why.
+    print("Error transcribing message: {}".format(result.Properties))
+else:
+    # No. Try to determine why.
+    print("Error transcribing message: {}".format(result.reason))
 
 
 # SLIDE 69
@@ -106,7 +119,17 @@ speech_synthesis_result = (
     speech_synthesizer.speak_text_async(text).get()
 )
 
-
+# Did it succeed?
+if speech_synthesis_result.reason == speech_sdk.ResultReason.SynthesizingAudioCompleted:
+    # Yes!
+    print("Speech synthesized for text [{}]".format(text))
+elif speech_synthesis_result.reason == speech_sdk.ResultReason.Canceled:
+    # No - Try to find out why not
+    cancellation_details = speech_synthesis_result.cancellation_details
+    print("Speech synthesis canceled: {}".format(cancellation_details.reason))
+    if cancellation_details.reason == speech_sdk.CancellationReason.Error:
+        if cancellation_details.error_details:
+            print("Error details: {}".format(cancellation_details.error_details))
 
 # SLIDE 69
 # ==========================================================
@@ -141,6 +164,14 @@ speech_synthesis_result = (
 # AZURE AI SPEECH - TRANSLATE SPEECH TO TEXT
 # Translates spoken language from a microphone into one or more target languages.
 # ============================================================
+
+# Connect to a Foundry resource endpoint
+translation_cfg = speech_sdk.translation.SpeechTranslationConfig(
+                    subscription="FOUNDRY_KEY", endpoint="FOUNDRY_ENDPOINT")
+
+# Or connect using a region
+translation_cfg = speech_sdk.translation.SpeechTranslationConfig(
+                    subscription="FOUNDRY_KEY", region="FOUNDRY_REGION")
 
 # Configure source and target languages
 translation_cfg.speech_recognition_language = "en-US"

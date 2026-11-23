@@ -7,6 +7,18 @@
 from azure.ai.formrecognizer import DocumentAnalysisClient
 from azure.core.credentials import AzureKeyCredential
 
+
+document_intelligence_client = DocumentIntelligenceClient(
+    endpoint=endpoint, credential=AzureKeyCredential(key)
+)
+
+# Analyze the invoice
+poller = document_intelligence_client.begin_analyze_document(
+    fileModelId,
+    AnalyzeDocumentRequest(url_source=fileUri),
+    locale=fileLocale
+) 
+
 # CONNECT TO DOCUMENT INTELLIGENCE
 document_analysis_client = DocumentAnalysisClient(
     endpoint="YOUR_DOC_INTELLIGENCE_ENDPOINT",

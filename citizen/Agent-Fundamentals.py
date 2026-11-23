@@ -377,3 +377,70 @@ agent = project_client.agents.create_version(
         ]
     )
 )
+
+
+# KK
+# ============================================================
+# Create a discoverable agent
+# ============================================================
+
+# Define the agent skill
+skill = AgentSkill(
+    id="generate_blog_title",
+    name="Generate Blog Title",
+    description="Generates a blog title based on a topic.",
+    tags=["title", "agent-framework"],
+    examples=["Give me a title for a post about remote agents."],
+)
+
+# Create the agent card
+card = AgentCard(
+    name="TitleAgent",
+    description="Generates a catchy blog post title for a given topic.",
+    version="1.0.0",
+    default_input_modes=["text"],
+    default_output_modes=["text"],
+    capabilities=AgentCapabilities(streaming=True, push_notifications=False),
+    supported_interfaces=[AgentInterface(url=url, protocol_binding="JSONRPC", protocol_version="1.0")],
+    skills=[skill],
+)
+
+# # AgentExecutor
+# Understand the agent executor
+# The AgentExecutor interface handles all incoming requests sent to your agent. It receives information about the request, processes it according to the agent’s capabilities, and sends responses or events back through a communication channel.
+
+# Key responsibilities:
+
+# Execute tasks requested by users or other agents.
+# Stream responses or send individual messages back to the client.
+# Handle task cancellation if supported.
+# Implement the interface
+# An Agent Executor typically defines two primary operations:
+
+# Execute
+
+# Processes incoming requests and generates responses.
+# Accesses request details (for example, user input, task context).
+# Sends results back via an event queue, which may include messages, task updates, or artifacts.
+# Cancel
+
+# Handles requests to cancel an ongoing task.
+# May not be supported for simple agents.
+
+
+class AgentFrameworkExecutor(AgentExecutor):
+    """Receives A2A messages, runs the agent, and streams the reply back as A2A artifacts."""
+
+    def __init__(self, state: AgentState) -> None:
+        self.state = state
+
+    async def cancel(self, context: RequestContext, event_queue: EventQueue) -> None:
+        updater = TaskUpdater(event_queue, context.task_id or "", context.context_id or "")
+        await updater.cancel()
+
+    async def execute(self, context: RequestContext, event_queue: EventQueue) -> None:
+        if context.message is None or context.context_id is None:
+            raise ValueError("A2A message and context id are required")
+
+        # Register a new A2A task for this request, then report its progress through the updater
+        task = context.current_task

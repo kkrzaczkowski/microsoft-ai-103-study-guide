@@ -4,6 +4,12 @@
 # Detects the language of one or more text documents and returns the language, ISO code, and confidence score.
 # ============================================================
 
+URL
+https://{your-foundry-resource-name}.services.ai.azure.com/api/projects/{project_name}
+
+client = TextAnalyticsClient(endpoint="YOUR_FOUNDRY_RESOURCE_ENDPOINT", 
+                             credential=credential)
+
 # Example documents to analyze
 documents = [
     "Hello World!",
@@ -119,12 +125,34 @@ for doc in response:
 # Example Output:
 
 # PII Entities in Document 0:
-#  - John Smith: Person
-#  - john.smith@contoso.com: Email
-#  - 555-012-456: PhoneNumber
-# Redacted Text: [PERSON] works at Contoso Ltd. His email is [EMAIL] and his phone number is [PHONENUMBER].
+#  - John Smith: Person (confidence: 0.99)
+#  - Contoso Ltd: Organization (confidence: 0.85)
+#  - john.smith@contoso.com: Email (confidence: 1.00)
+#  - 555-012-456: PhoneNumber (confidence: 0.80)
+# Redacted Text: ********** works at ************. His email is ************************ and his phone number is ********.
 
 # PII Entities in Document 1:
-#  - Sarah Johnson: Person
-#  - 123-45-6789: USSocialSecurityNumber
-# Redacted Text:  Patient [PERSON], SSN [USSOCIALSECURITYNUMBER], was admitted on 03/15/2024.
+#  - Sarah Johnson: Person (confidence: 0.99)
+#  - 123-45-6789: USSocialSecurityNumber (confidence: 0.99)
+#  - 03/15/2024: DateTime (confidence: 0.80)
+# Redacted Text:  Patient *************, SSN ***********, was admitted on **********.
+
+
+
+
+# ============================================================
+# AZURE AI LANGUAGE - MCP
+# ============================================================
+
+
+
+https://{foundry-resource-name}.cognitiveservices.azure.com/language/mcp?api-version=2025-11-15-preview
+
+
+MCP Document language tool
+
+mcp_tool = MCPTool(
+    server_label="azure-language",
+    server_url="https://{foundry-resource-name}.cognitiveservices.azure.com/language/mcp?api-version=2025-11-15-preview",
+    require_approval="always",
+)

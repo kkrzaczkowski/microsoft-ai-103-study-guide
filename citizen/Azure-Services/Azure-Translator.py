@@ -4,6 +4,19 @@
 # Translates text into one or more target languages and returns the detected source language.
 # ============================================================
 
+The Azure Translator global endpoint: api.cognitive.microsofttranslator.com
+Azure Translator regional endpoints: These endpoints include api-nam.cognitive.microsofttranslator.com, api-apc.cognitive.microsofttranslator.com, and api-eur.cognitive.microsofttranslator.com
+Foundry resource endpoints: {foundry-resource-name}.cognitiveservices.azure.com/
+
+
+key_credential = AzureKeyCredential("FOUNDRY_KEY")
+
+# Connect to a Foundry resource endpoint
+client = TextTranslationClient(credential=key_credential, endpoint="FOUNDRY_ENDPOINT")
+
+# Or connect using a region
+client = TextTranslationClient(credential=key_credential, region="FOUNDRY_REGION")
+
 # Text to translate
 input_text_elements = [
     InputTextItem(text="Hola"),
